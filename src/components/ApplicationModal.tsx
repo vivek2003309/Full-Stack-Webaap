@@ -1,0 +1,345 @@
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle2, User, Phone, FileText, MapPin, Globe, Sparkles, AlertCircle } from 'lucide-react';
+import { Job, InterviewDrive } from '../types';
+
+interface ApplicationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedJob?: Job | null;
+  selectedDrive?: InterviewDrive | null;
+  onRegisteredSuccess?: (passport: string) => void;
+}
+
+export const ApplicationModal: React.FC<ApplicationModalProps> = ({
+  isOpen,
+  onClose,
+  selectedJob,
+  selectedDrive,
+  onRegisteredSuccess
+}) => {
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [passportNumber, setPassportNumber] = useState('');
+  const [trade, setTrade] = useState(
+    selectedJob?.title || selectedDrive?.tradesAllowed[0] || 'Logistics Van Driver'
+  );
+  const [targetCountry, setTargetCountry] = useState(
+    selectedJob?.country || selectedDrive?.countryDestination || 'Russia'
+  );
+  const [interviewCity, setInterviewCity] = useState<string>(
+    selectedDrive?.city || 'Delhi'
+  );
+  const [remarks, setRemarks] = useState(
+    selectedDrive ? `Registered for walk-in drive at ${selectedDrive.city} (${selectedDrive.driveDate})` : 'Online application through TICE portal'
+  );
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submittedData, setSubmittedData] = useState<{ id: string; passportNumber: string; rawPassport: string } | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSubmittedData(null);
+      setError(null);
+      setTrade(selectedJob?.title || selectedDrive?.tradesAllowed[0] || 'Logistics Van Driver');
+      setTargetCountry(selectedJob?.country || selectedDrive?.countryDestination || 'Russia');
+      setInterviewCity(selectedDrive?.city || 'Delhi');
+      setRemarks(
+        selectedDrive 
+          ? `Registered for walk-in drive at ${selectedDrive.city} (${selectedDrive.driveDate})` 
+          : selectedJob 
+          ? `Direct application for ${selectedJob.title} (${selectedJob.country})`
+          : 'Online application through TICE portal'
+      );
+    }
+  }, [isOpen, selectedJob, selectedDrive]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName || !phone || !passportNumber || !trade || !targetCountry) {
+      setError('Please fill in all mandatory fields.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const formattedPassport = passportNumber.trim().toUpperCase();
+
+    try {
+      const response = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          phone,
+          passportNumber: formattedPassport,
+          trade,
+          targetCountry,
+          interviewCity,
+          remarks
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit application');
+      }
+
+      setSubmittedData({
+        id: data.application.id,
+        passportNumber: data.application.passportNumber,
+        rawPassport: formattedPassport
+      });
+    } catch (err: any) {
+      setError(err.message || 'Error communicating with server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTrackNow = () => {
+    if (submittedData && onRegisteredSuccess) {
+      onRegisteredSuccess(submittedData.rawPassport || submittedData.id);
+    }
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto relative text-slate-900 dark:text-slate-100">
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {submittedData ? (
+          /* SUCCESS STATE */
+          <div className="text-center py-6 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle2 className="w-9 h-9" />
+            </div>
+
+            <div>
+              <span className="text-xs uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
+                Registration Confirmed
+              </span>
+              <h3 className="text-2xl font-black text-[#0F2444] dark:text-white mt-1 font-['Space_Grotesk']">
+                Application Successfully Logged!
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+                Your candidate registration is recorded in the TICE central database and dispatched to the processing queue.
+              </p>
+            </div>
+
+            {/* Token Badge */}
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-slate-950 border border-amber-200 dark:border-amber-500/30 inline-block text-left w-full">
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <span>Application Token ID:</span>
+                <span className="font-mono text-blue-700 dark:text-sky-400 font-bold">Stage 1: Application Review</span>
+              </div>
+              <div className="text-2xl font-mono font-black text-[#0F2444] dark:text-amber-400 tracking-wider">
+                {submittedData.id}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Passport No: <strong className="text-slate-800 dark:text-slate-200 font-mono">{submittedData.passportNumber}</strong>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={handleTrackNow}
+                className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                Track Live Status in Portal
+              </button>
+              <button
+                onClick={onClose}
+                className="py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* FORM STATE */
+          <div>
+            <div className="mb-6">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-500/30 px-2.5 py-0.5 rounded-full">
+                MEA Verified Candidate Gateway
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#0F2444] dark:text-white mt-1.5 font-['Space_Grotesk']">
+                {selectedDrive ? 'Register for Walk-In Drive' : 'Overseas Job Application'}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Enter your genuine passport details. Your record will be assigned a unique tracking token.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              
+              {/* Full Name */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Full Name (As on Passport) *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Ramesh Kumar Verma"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 pl-9 pr-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-xs"
+                  />
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                </div>
+              </div>
+
+              {/* Phone & Passport row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Phone / WhatsApp *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 pl-9 pr-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-xs"
+                    />
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Passport Number *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={passportNumber}
+                      onChange={(e) => setPassportNumber(e.target.value.toUpperCase())}
+                      placeholder="e.g. P1234567"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 pl-9 pr-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-xs uppercase"
+                    />
+                    <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+                    <span>🔒 Protected: Masked across public trackers for candidate safety.</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Trade & Target Country */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Trade / Designation *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={trade}
+                    onChange={(e) => setTrade(e.target.value)}
+                    placeholder="e.g. 6G Welder / Logistics Driver"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 px-3 text-slate-900 dark:text-white focus:outline-none text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Target Destination *
+                  </label>
+                  <select
+                    value={targetCountry}
+                    onChange={(e) => setTargetCountry(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 px-3 text-slate-900 dark:text-white focus:outline-none text-xs"
+                  >
+                    <option value="Russia">Russia</option>
+                    <option value="Oman">Oman</option>
+                    <option value="Qatar">Qatar</option>
+                    <option value="Kuwait">Kuwait</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="Europe">Europe</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Interview City */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Preferred Interview / Trade Test City *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['Delhi', 'Mumbai', 'Gorakhpur'].map((city) => (
+                    <button
+                      type="button"
+                      key={city}
+                      onClick={() => setInterviewCity(city)}
+                      className={`py-2 px-3 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                        interviewCity === city
+                          ? 'bg-[#0F2444] dark:bg-amber-500 text-white dark:text-slate-950 border-[#0F2444] dark:border-amber-400'
+                          : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Remarks */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Additional Experience / Remarks
+                </label>
+                <textarea
+                  rows={2}
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="e.g. 3 years GCC experience with valid heavy driving license."
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl p-2.5 text-slate-900 dark:text-white focus:outline-none text-xs"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold text-sm shadow-md shadow-amber-500/20 transition cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? 'Submitting Registration...' : 'Submit Application & Generate Token'}
+                </button>
+              </div>
+
+              <p className="text-[11px] text-center text-slate-400 dark:text-slate-500">
+                Official registration under MEA License B-0613/DEL/COM/1000+/5/5374/1999
+              </p>
+            </form>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};

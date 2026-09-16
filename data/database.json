@@ -1,0 +1,307 @@
+{
+  "jobs": [
+    {
+      "title": "developer",
+      "country": "Europe",
+      "flagEmoji": "Eu",
+      "vacanciesCount": 50,
+      "salaryText": "₹70,000 / $840 per month",
+      "perks": [
+        "Free Food",
+        "Accommodation",
+        "Medical"
+      ],
+      "category": "Technical",
+      "status": "Active",
+      "description": "",
+      "workLocation": "",
+      "id": "job-1789592299069-yxuz",
+      "createdAt": "2026-09-16T20:58:19.069Z"
+    },
+    {
+      "id": "job-1",
+      "title": "Logistics Van Driver",
+      "country": "Russia",
+      "flagEmoji": "🇷🇺",
+      "vacanciesCount": 350,
+      "salaryText": "₹75,000 / $900 per month",
+      "perks": [
+        "Free Food",
+        "Company Accommodation",
+        "Medical Insurance",
+        "Overtime Allowance"
+      ],
+      "category": "Logistics",
+      "status": "Active",
+      "createdAt": "2026-09-01T20:48:14.331Z",
+      "description": "Urgent requirement for Light/Medium Commercial Vehicle (LCV) delivery drivers in Moscow & St. Petersburg e-commerce distribution centers. Valid Indian or GCC driving license required with clean record.",
+      "requirements": [
+        "Minimum 2 years driving experience",
+        "Valid Indian Commercial or GCC driving license",
+        "Basic English or willingness to learn Russian phrases",
+        "Age 22 - 42 years"
+      ],
+      "workLocation": "Moscow & St. Petersburg Logistic Hubs"
+    },
+    {
+      "id": "job-2",
+      "title": "6G Pipe Welder",
+      "country": "Oman",
+      "flagEmoji": "🇴🇲",
+      "vacanciesCount": 120,
+      "salaryText": "₹60,000 / 270 OMR per month",
+      "perks": [
+        "Free Food",
+        "Furnished Bachelor Camp",
+        "Full Medical",
+        "Flight Return"
+      ],
+      "category": "Technical",
+      "status": "Active",
+      "createdAt": "2026-09-06T20:48:14.331Z",
+      "description": "TIG & ARC 6G Welders needed for major Oil & Gas pipeline project in Duqm and Sohar Industrial port. Mandatory 6G carbon & stainless steel pipe test clearance.",
+      "requirements": [
+        "Certification in SMAW/GTAW 6G",
+        "Minimum 3 years oil & gas pipeline experience",
+        "Clean trade test at TICE testing workshop"
+      ],
+      "workLocation": "Duqm Oil & Gas Refinery Project"
+    },
+    {
+      "id": "job-3",
+      "title": "HVAC Technician",
+      "country": "Qatar",
+      "flagEmoji": "🇶🇦",
+      "vacanciesCount": 85,
+      "salaryText": "₹55,000 / 2,400 QAR per month",
+      "perks": [
+        "Free Accommodation",
+        "Transport Provided",
+        "Medical Card",
+        "Yearly Bonus"
+      ],
+      "category": "MEP",
+      "status": "Active",
+      "createdAt": "2026-09-09T20:48:14.331Z",
+      "description": "Central chiller plant, AHU, FCU, and VRV/VRF system maintenance technicians for luxury hospitality and commercial tower facility management in Doha.",
+      "requirements": [
+        "ITI or Diploma in Refrigeration & Air Conditioning",
+        "Troubleshooting electrical panel control circuits",
+        "Minimum 3 years Gulf or Indian high-rise experience"
+      ],
+      "workLocation": "Lusail Marina Towers, Doha"
+    },
+    {
+      "id": "job-4",
+      "title": "Heavy Trailer Driver",
+      "country": "Kuwait",
+      "flagEmoji": "🇰🇼",
+      "vacanciesCount": 40,
+      "salaryText": "₹80,000 / 290 KWD per month",
+      "perks": [
+        "Free Accommodation",
+        "Trip Allowance",
+        "Health Insurance",
+        "Uniform Provided"
+      ],
+      "category": "Logistics",
+      "status": "Active",
+      "createdAt": "2026-09-11T20:48:14.331Z",
+      "description": "Multi-axle articulated heavy trailer drivers for bulk petroleum and freight transit between Shuaiba Port and Mina Al Ahmadi terminal.",
+      "requirements": [
+        "Valid GCC or Indian Heavy Transport Vehicle (HTV) license",
+        "5+ years articulated trailer experience",
+        "Physical fitness GAMCA certification"
+      ],
+      "workLocation": "Shuaiba Port Logistics Hub"
+    },
+    {
+      "id": "job-5",
+      "title": "Civil Mason",
+      "country": "Oman",
+      "flagEmoji": "🇴🇲",
+      "vacanciesCount": 90,
+      "salaryText": "₹45,000 / 200 OMR per month",
+      "perks": [
+        "Free Food",
+        "Accommodation",
+        "Medical Insurance",
+        "Overtime"
+      ],
+      "category": "Construction",
+      "status": "Active",
+      "createdAt": "2026-09-13T20:48:14.331Z",
+      "description": "Skilled block, plaster, and tile masons for commercial infrastructure development project in Muscat. Fast-track visa deployment.",
+      "requirements": [
+        "Experienced in blockwork, plastering, and floor/wall tiling",
+        "Minimum 2 years commercial site experience",
+        "Clean police clearance (PCC)"
+      ],
+      "workLocation": "Muscat Highway Infrastructure Zone"
+    }
+  ],
+  "applications": [
+    {
+      "id": "TRH-7466",
+      "fullName": "Test Candidate",
+      "phone": "+91 99999 88888",
+      "passportNumber": "K1234567",
+      "trade": "6G Pipe Welder",
+      "targetCountry": "Oman",
+      "interviewCity": "Mumbai",
+      "currentStage": 1,
+      "remarks": "Application received and under preliminary review.",
+      "createdAt": "2026-09-16T22:22:51.482Z",
+      "updatedAt": "2026-09-16T22:22:51.482Z"
+    },
+    {
+      "id": "TRH-9988",
+      "fullName": "Vivek",
+      "phone": "8912345678",
+      "passportNumber": "08978675",
+      "trade": "Logistics Van Driver",
+      "targetCountry": "Russia & Kuwait",
+      "interviewCity": "Delhi",
+      "currentStage": 1,
+      "remarks": "Registered for walk-in drive at Gorakhpur (Oct 14, 2026 (09:00 AM - 05:00 PM))",
+      "createdAt": "2026-09-16T22:08:06.044Z",
+      "updatedAt": "2026-09-16T22:08:06.044Z"
+    },
+    {
+      "id": "TRH-3878",
+      "fullName": "Rajesh Kumar Verma",
+      "phone": "+91 98112 34567",
+      "passportNumber": "M9283716",
+      "trade": "6G Pipe Welder",
+      "targetCountry": "Oman",
+      "interviewCity": "Mumbai",
+      "currentStage": 1,
+      "remarks": "Trade assessment cleared at Mumbai centre.",
+      "createdAt": "2026-09-16T21:37:47.704Z",
+      "updatedAt": "2026-09-16T21:37:47.704Z"
+    },
+    {
+      "id": "TRH-9652",
+      "fullName": "Vivek",
+      "phone": "8927678567",
+      "passportNumber": "0778757",
+      "trade": "developer",
+      "targetCountry": "Europe",
+      "interviewCity": "Delhi",
+      "currentStage": 1,
+      "remarks": "Direct application for developer (Europe)",
+      "createdAt": "2026-09-16T21:21:24.048Z",
+      "updatedAt": "2026-09-16T21:21:24.048Z"
+    },
+    {
+      "id": "TRH-5648",
+      "fullName": "Joe",
+      "phone": "9988776655",
+      "passportNumber": "0897757",
+      "trade": "Logistics Van Driver",
+      "targetCountry": "Europe",
+      "interviewCity": "Delhi",
+      "currentStage": 1,
+      "remarks": "Application registered successfully. Trade assessment scheduled.",
+      "createdAt": "2026-09-16T21:00:58.584Z",
+      "updatedAt": "2026-09-16T21:00:58.584Z"
+    },
+    {
+      "id": "TRH-8821",
+      "fullName": "Ramesh Kumar Verma",
+      "phone": "+91 98765 43210",
+      "passportNumber": "P1234567",
+      "trade": "Logistics Van Driver",
+      "targetCountry": "Russia",
+      "interviewCity": "Gorakhpur",
+      "currentStage": 4,
+      "remarks": "Emigration check submitted, flight tentative Oct 2026",
+      "createdAt": "2026-08-14T09:30:00.000Z",
+      "updatedAt": "2026-09-10T14:15:00.000Z"
+    },
+    {
+      "id": "TRH-6492",
+      "fullName": "Mohammad Irfan Ansari",
+      "phone": "+91 91234 56789",
+      "passportNumber": "R9876543",
+      "trade": "6G Pipe Welder",
+      "targetCountry": "Oman",
+      "interviewCity": "Mumbai",
+      "currentStage": 2,
+      "remarks": "Medical fitness passed at GAMCA center",
+      "createdAt": "2026-08-28T11:00:00.000Z",
+      "updatedAt": "2026-09-08T16:45:00.000Z"
+    },
+    {
+      "id": "TRH-4105",
+      "fullName": "Balwinder Singh Dhillon",
+      "phone": "+91 98111 22334",
+      "passportNumber": "Z5566778",
+      "trade": "Heavy Trailer Driver",
+      "targetCountry": "Kuwait",
+      "interviewCity": "Delhi",
+      "currentStage": 5,
+      "remarks": "Police Clearance Certificate verified by Regional Passport Office. Ticket booking queue.",
+      "createdAt": "2026-08-05T10:00:00.000Z",
+      "updatedAt": "2026-09-12T10:20:00.000Z"
+    },
+    {
+      "id": "TRH-3390",
+      "fullName": "Sunil Kumar Maurya",
+      "phone": "+91 94500 11223",
+      "passportNumber": "A9081726",
+      "trade": "HVAC Technician",
+      "targetCountry": "Qatar",
+      "interviewCity": "Gorakhpur",
+      "currentStage": 3,
+      "remarks": "Work permit quota assigned by Qatar Ministry of Labour. Awaiting MOI approval.",
+      "createdAt": "2026-08-18T08:15:00.000Z",
+      "updatedAt": "2026-09-05T12:00:00.000Z"
+    }
+  ],
+  "interviewDrives": [
+    {
+      "id": "drv-1",
+      "city": "Gorakhpur",
+      "venue": "Hotel Royal Residency, University Road, Gorakhpur, UP",
+      "driveDate": "Oct 14, 2026 (09:00 AM - 05:00 PM)",
+      "tradesAllowed": [
+        "Logistics Van Driver",
+        "Heavy Trailer Driver",
+        "Warehouse Staff"
+      ],
+      "countryDestination": "Russia & Kuwait"
+    },
+    {
+      "id": "drv-2",
+      "city": "Mumbai",
+      "venue": "TICE Technical Trade Test Centre, Plot 14-B, MIDC Andheri East, Mumbai",
+      "driveDate": "Oct 18, 2026 (09:30 AM - 06:00 PM)",
+      "tradesAllowed": [
+        "6G Pipe Welder",
+        "MEP Technician",
+        "HVAC Technician",
+        "Structural Fitter"
+      ],
+      "countryDestination": "Oman (Duqm Refinery Project)"
+    },
+    {
+      "id": "drv-3",
+      "city": "Delhi",
+      "venue": "TICE Corporate Headquarters, 4th Floor, Janakpuri District Centre, New Delhi",
+      "driveDate": "Oct 22, 2026 (10:00 AM - 05:30 PM)",
+      "tradesAllowed": [
+        "Civil Mason",
+        "Electrician",
+        "HVAC Technician",
+        "Logistics Van Driver"
+      ],
+      "countryDestination": "Qatar & Russia"
+    }
+  ],
+  "appSettings": {
+    "id": "global",
+    "googleSheetsWebhookUrl": "",
+    "adminPasscode": "trehan2026"
+  }
+}
