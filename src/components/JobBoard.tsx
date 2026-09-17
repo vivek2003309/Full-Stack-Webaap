@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Briefcase, MapPin, DollarSign, Check, Phone, ArrowUpRight, MessageSquare, Send, Sparkles, Filter, X } from 'lucide-react';
 import { Job } from '../types';
 import { Language, translations } from '../translations';
@@ -102,7 +103,13 @@ export const JobBoard: React.FC<JobBoardProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-3xl mx-auto mb-12"
+        >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 text-xs font-bold uppercase tracking-wider mb-3">
             <Briefcase className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
             <span>Government Verified Demand</span>
@@ -113,10 +120,16 @@ export const JobBoard: React.FC<JobBoardProps> = ({
           <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg">
             {t.jobBoardSubtitle}
           </p>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/90 dark:border-slate-800 mb-10 space-y-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+          className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/90 dark:border-slate-800 mb-10 space-y-4"
+        >
           
           {/* Country Filters */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -163,7 +176,7 @@ export const JobBoard: React.FC<JobBoardProps> = ({
             ))}
           </div>
 
-        </div>
+        </motion.div>
 
         {/* Loading State / Skeleton */}
         {loading ? (
@@ -239,9 +252,13 @@ export const JobBoard: React.FC<JobBoardProps> = ({
         ) : (
           /* Jobs Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {jobs.map((job) => (
-              <div
+            {jobs.map((job, idx) => (
+              <motion.div
                 key={job.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.45, delay: (idx % 3) * 0.08, ease: "easeOut" }}
                 className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between overflow-hidden group"
               >
                 {/* Card Top */}
@@ -332,7 +349,7 @@ export const JobBoard: React.FC<JobBoardProps> = ({
                   </button>
                 </div>
 
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { 
   Flame, 
   Truck, 
@@ -65,7 +66,13 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <motion.div 
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-3xl mx-auto mb-14"
+        >
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold uppercase tracking-wider mb-3">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span>Inspection-Ready Technical Infrastructure</span>
@@ -76,13 +83,19 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
           <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg">
             {t.infraSubtitle}
           </p>
-        </div>
+        </motion.div>
 
         {/* 3-Column Facilities Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           
           {/* Facility 1: Practical Welding & Piping Workshop */}
-          <div className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group">
+          <motion.div 
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0, ease: "easeOut" }}
+            className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group"
+          >
             <div className="h-56 bg-slate-900 relative overflow-hidden flex items-center justify-center">
               {/* Graphic visual illustration for Welding Workshop */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent z-10" />
@@ -118,10 +131,16 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Facility 2: Heavy Machinery Simulator & Operating Grounds */}
-          <div className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group">
+          <motion.div 
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0.12, ease: "easeOut" }}
+            className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group"
+          >
             <div className="h-56 bg-slate-900 relative overflow-hidden flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent z-10" />
               <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center z-20">
@@ -156,10 +175,16 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Facility 3: Digital Emigration & Pre-Departure Classrooms */}
-          <div className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group">
+          <motion.div 
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0.24, ease: "easeOut" }}
+            className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 group"
+          >
             <div className="h-56 bg-slate-900 relative overflow-hidden flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent z-10" />
               <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center z-20">
@@ -194,7 +219,7 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
         </div>
 
@@ -203,22 +228,32 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
             KEY SECTORS WE SERVE
            ========================================= */}
         <div id="sectors" className="mb-20">
-          <div className="text-center max-w-2xl mx-auto mb-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center max-w-2xl mx-auto mb-10"
+          >
             <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0F2444] dark:text-white font-['Space_Grotesk']">
               {t.sectorsTitle}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
               Deep industry specialization with tailored technical grading for global EPC contractors.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {sectors.map((sec) => {
+            {sectors.map((sec, sIdx) => {
               const IconComp = sec.icon;
               const isSelected = activeSector === sec.id;
               return (
-                <div
+                <motion.div
                   key={sec.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: sIdx * 0.08, ease: "easeOut" }}
                   onClick={() => setActiveSector(sec.id as any)}
                   className={`p-5 rounded-2xl border text-center transition-all cursor-pointer ${
                     isSelected
@@ -235,14 +270,20 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
                   <p className={`text-[11px] leading-tight ${isSelected ? 'text-slate-300 dark:text-slate-900 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
                     {sec.stats}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
 
           {/* Active Sector Details Panel */}
           {sectors.find(s => s.id === activeSector) && (
-            <div className="mt-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="mt-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6"
+            >
               <div className="space-y-1">
                 <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                   Featured Capabilities
@@ -262,7 +303,7 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
                 <span>Request Workforce Quota</span>
                 <ChevronRight className="w-4 h-4 text-amber-400 dark:text-slate-950" />
               </button>
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -271,19 +312,31 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
             HOW WE WORK: 4-STEP WORKFLOW
            ========================================= */}
         <div>
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center max-w-2xl mx-auto mb-12"
+          >
             <div className="text-xs font-bold uppercase text-amber-600 dark:text-amber-400 tracking-wider mb-1">
               End-to-End Mobilization Standard
             </div>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0F2444] dark:text-white font-['Space_Grotesk']">
               {t.howWeWorkTitle}
             </h3>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
             
             {/* Step 1 */}
-            <div className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors">
+            <motion.div 
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: 0, ease: "easeOut" }}
+              className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors"
+            >
               <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-bold text-sm flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
                 1
               </div>
@@ -291,10 +344,16 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Client provides job specifications, salary scale, and required skill certifications.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 2 */}
-            <div className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors">
+            <motion.div 
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: 0.1, ease: "easeOut" }}
+              className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors"
+            >
               <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-bold text-sm flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
                 2
               </div>
@@ -302,10 +361,16 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Candidates undergo live practical assessments at TICE centers with client representatives.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 3 */}
-            <div className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors">
+            <motion.div 
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: 0.2, ease: "easeOut" }}
+              className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors"
+            >
               <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-bold text-sm flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
                 3
               </div>
@@ -313,10 +378,16 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 GAMCA medical, visa stamping, MEA Emigration clearance, and ticketing processed in-house.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 4 */}
-            <div className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors">
+            <motion.div 
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: 0.3, ease: "easeOut" }}
+              className="bg-slate-50 dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center relative group hover:border-amber-400 transition-colors"
+            >
               <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-bold text-sm flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
                 4
               </div>
@@ -324,7 +395,7 @@ export const InfrastructureShowcase: React.FC<InfrastructureShowcaseProps> = ({ 
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Airport dispatch, on-site camp onboarding coordination, and 90-day candidate warranty.
               </p>
-            </div>
+            </motion.div>
 
           </div>
         </div>

@@ -47,6 +47,11 @@ export const translations = {
     applyWhatsApp: "Apply on WhatsApp",
     applyNow: "Quick Apply",
     
+    // Career Guidance
+    guidanceBadge: "Career Readiness & Preparation",
+    guidanceTitle: "Interview & Resume Success Guide",
+    guidanceSubtitle: "Essential preparation standards, technical test bay protocols, and CV formatting tips to help you clear client interviews.",
+    
     // Drives Calendar
     calendarTitle: "Upcoming Walk-In Client Interview Drives",
     calendarSubtitle: "Meet visiting delegates from Oman, Russia, and Qatar directly at our authorized centers",
@@ -121,6 +126,11 @@ export const translations = {
     viewDetails: "विवरण देखें",
     applyWhatsApp: "व्हाट्सएप पर आवेदन करें",
     applyNow: "ऑनलाइन आवेदन करें",
+    
+    // Career Guidance
+    guidanceBadge: "करियर मार्गदर्शन एवं तैयारी",
+    guidanceTitle: "इंटरव्यू एवं रिज्यूमे (CV) तैयारी गाइड",
+    guidanceSubtitle: "विदेश चयन प्रक्रिया, व्यावहारिक ट्रेड टेस्ट और क्लाइंट इंटरव्यू में शत-प्रतिशत सफलता के महत्वपूर्ण टिप्स।",
     
     // Drives Calendar
     calendarTitle: "आगामी वॉक-इन क्लाइंट इंटरव्यू कैलेंडर",

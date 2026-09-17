@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Calendar, MapPin, Users, ArrowRight, Clock, Building, CheckCircle } from 'lucide-react';
 import { InterviewDrive } from '../types';
 import { Language, translations } from '../translations';
@@ -76,7 +77,13 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <motion.div 
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-3xl mx-auto mb-14"
+        >
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider mb-3">
             <Calendar className="w-3.5 h-3.5 text-amber-400" />
             <span>Face-to-Face Foreign Delegation Interviews</span>
@@ -87,7 +94,7 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
           <p className="mt-3 text-slate-300 text-base sm:text-lg">
             {t.calendarSubtitle}
           </p>
-        </div>
+        </motion.div>
 
         {/* Drives Grid / Skeleton */}
         {isLoading && drives.length === 0 ? (
@@ -141,9 +148,13 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {drives.map((drive) => (
-              <div
+            {drives.map((drive, index) => (
+              <motion.div
                 key={drive.id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: index * 0.12, ease: "easeOut" }}
                 className="bg-slate-800/90 border border-slate-700/80 hover:border-amber-500/50 rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-xl hover:shadow-2xl group relative"
               >
                 {/* Top Badge */}
@@ -209,13 +220,19 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
                   </button>
                 </div>
 
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
 
         {/* Note on requirements */}
-        <div className="mt-10 p-4 rounded-2xl bg-slate-800/50 border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
+        <motion.div 
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20px" }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-10 p-4 rounded-2xl bg-slate-800/50 border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300"
+        >
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>
@@ -223,7 +240,7 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
             </span>
           </div>
           <span className="text-amber-400 font-semibold shrink-0">No Pre-Interview Registration Fees</span>
-        </div>
+        </motion.div>
 
       </div>
     </section>

@@ -9,6 +9,7 @@ import { TopBar } from './components/TopBar';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { JobBoard } from './components/JobBoard';
+import { CareerGuidance } from './components/CareerGuidance';
 import { InterviewCalendar } from './components/InterviewCalendar';
 import { InfrastructureShowcase } from './components/InfrastructureShowcase';
 import { TestimonialsAndStats } from './components/TestimonialsAndStats';
@@ -200,7 +201,12 @@ export default function App() {
         filterCountry={filterCountry}
       />
 
-      {/* 5. Client Walk-In Interview Calendar */}
+      {/* 5. Career Guidance & Interview Preparation Tips */}
+      <CareerGuidance 
+        lang={lang}
+      />
+
+      {/* 6. Client Walk-In Interview Calendar */}
       <InterviewCalendar 
         lang={lang}
         onRegisterDrive={handleRegisterDrive}

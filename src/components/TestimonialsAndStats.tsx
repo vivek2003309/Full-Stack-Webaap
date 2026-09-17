@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import { Star, Quote, Award, ShieldCheck, Users, Globe2 } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { CountryFlag } from './CountryFlag';
@@ -136,8 +137,12 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
            ========================================= */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           
-          <div 
+          <motion.div 
             id="stat-card-legacy" 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.45, delay: 0, ease: "easeOut" }}
             className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-amber-300/80 dark:hover:border-amber-500/50 transition-all duration-300 text-center group"
           >
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -149,10 +154,14 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
               {t.statYears} (Since 1999)
             </p>
-          </div>
+          </motion.div>
 
-          <div 
+          <motion.div 
             id="stat-card-mobilized" 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
             className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300/80 dark:hover:border-sky-500/50 transition-all duration-300 text-center group"
           >
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-sky-950/60 text-blue-700 dark:text-sky-400 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -164,10 +173,14 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
               {t.statMobilized}
             </p>
-          </div>
+          </motion.div>
 
-          <div 
+          <motion.div 
             id="stat-card-compliance" 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.45, delay: 0.16, ease: "easeOut" }}
             className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300/80 dark:hover:border-emerald-500/50 transition-all duration-300 text-center group"
           >
             <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -179,10 +192,14 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
               {t.statCompliance}
             </p>
-          </div>
+          </motion.div>
 
-          <div 
+          <motion.div 
             id="stat-card-nations" 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.45, delay: 0.24, ease: "easeOut" }}
             className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300/80 dark:hover:border-indigo-500/50 transition-all duration-300 text-center group"
           >
             <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -194,14 +211,21 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
               Deploying Nations
             </p>
-          </div>
+          </motion.div>
 
         </div>
+
 
         {/* =========================================
             TESTIMONIALS (AUTHENTIC GOOGLE REVIEWS)
            ========================================= */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <motion.div 
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-3xl mx-auto mb-14"
+        >
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold uppercase tracking-wider mb-3">
             <Quote className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span>Google Reviews &amp; Candidate Feedback</span>
@@ -212,12 +236,16 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
           <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg">
             Authentic experiences from candidates recruited and mobilized across Russia, Oman, and the Middle East.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((item, idx) => (
-            <div
+            <motion.div
               key={idx}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: idx * 0.1, ease: "easeOut" }}
               className="bg-white dark:bg-slate-900 rounded-2xl p-7 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-xl dark:shadow-slate-950/60 transition-all duration-300 relative group"
             >
               <div>
@@ -254,7 +282,7 @@ export const TestimonialsAndStats: React.FC<TestimonialsAndStatsProps> = ({ lang
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{item.date}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
