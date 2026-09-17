@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, User, Phone, FileText, MapPin, Globe, Sparkles, AlertCircle } from 'lucide-react';
 import { Job, InterviewDrive } from '../types';
+import { apiSubmitApplication } from '../services/apiService';
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -69,24 +70,18 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
     const formattedPassport = passportNumber.trim().toUpperCase();
 
     try {
-      const response = await fetch('/api/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName,
-          phone,
-          passportNumber: formattedPassport,
-          trade,
-          targetCountry,
-          interviewCity,
-          remarks
-        })
+      const data = await apiSubmitApplication({
+        fullName,
+        phone,
+        passportNumber: formattedPassport,
+        trade,
+        targetCountry,
+        interviewCity,
+        remarks
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit application');
+      if (!data || !data.success || !data.application) {
+        throw new Error(data?.message || 'Failed to submit application');
       }
 
       setSubmittedData({

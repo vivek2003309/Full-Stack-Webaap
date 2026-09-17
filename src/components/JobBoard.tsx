@@ -3,6 +3,7 @@ import { Briefcase, MapPin, DollarSign, Check, Phone, ArrowUpRight, MessageSquar
 import { Job } from '../types';
 import { Language, translations } from '../translations';
 import { CountryFlag } from './CountryFlag';
+import { apiFetchJobs, INITIAL_JOBS, getStoredJobs } from '../services/apiService';
 
 interface JobBoardProps {
   lang: Language;
@@ -24,8 +25,15 @@ export const JobBoard: React.FC<JobBoardProps> = ({
   filterCountry 
 }) => {
   const t = translations[lang];
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState<Job[]>(() => {
+    try {
+      const stored = getStoredJobs();
+      return stored && stored.length > 0 ? stored : INITIAL_JOBS;
+    } catch {
+      return INITIAL_JOBS;
+    }
+  });
+  const [loading, setLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("All");
   const [selectedTrade, setSelectedTrade] = useState("All");
   const [detailModalJob, setDetailModalJob] = useState<Job | null>(null);
@@ -44,37 +52,35 @@ export const JobBoard: React.FC<JobBoardProps> = ({
     }
   }, [filterTrade, propTrade]);
 
-  const fetchJobs = async () => {
-    setLoading(true);
+  const fetchJobs = async (showSkeleton = false) => {
+    if (showSkeleton) setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedCountry !== 'All') params.append('country', selectedCountry);
-      if (selectedTrade !== 'All') params.append('trade', selectedTrade);
-
-      const res = await fetch(`/api/jobs?${params.toString()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data);
-      }
+      const data = await apiFetchJobs({
+        country: selectedCountry,
+        trade: selectedTrade
+      });
+      setJobs(data);
     } catch (err) {
       console.error('Failed to load jobs:', err);
     } finally {
-      setLoading(false);
+      if (showSkeleton) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchJobs();
+    fetchJobs(jobs.length === 0);
   }, [selectedCountry, selectedTrade]);
 
-  // Real-time synchronization when admin adds/modifies/deletes jobs
+  // Real-time synchronization when admin adds/modifies/deletes jobs or when data changes
   useEffect(() => {
     const handleJobsUpdated = () => {
-      fetchJobs();
+      fetchJobs(false);
     };
     window.addEventListener('jobsUpdated', handleJobsUpdated);
+    window.addEventListener('tice_data_changed', handleJobsUpdated);
     return () => {
       window.removeEventListener('jobsUpdated', handleJobsUpdated);
+      window.removeEventListener('tice_data_changed', handleJobsUpdated);
     };
   }, [selectedCountry, selectedTrade]);
 

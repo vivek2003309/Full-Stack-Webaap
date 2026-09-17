@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { TopBar } from './components/TopBar';
 import { Navbar } from './components/Navbar';
@@ -33,6 +33,32 @@ export default function App() {
   const [isEmployerOpen, setIsEmployerOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
+
+  // Synchronize hash & path routes (e.g. /admin or #admin)
+  useEffect(() => {
+    const handleRoute = () => {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+
+      if (hash === '#admin' || path.includes('/admin')) {
+        setIsAdminOpen(true);
+      } else if (hash === '#license' || hash === '#certificate') {
+        setIsLicenseOpen(true);
+      } else if (hash === '#contact') {
+        setIsContactOpen(true);
+      } else if (hash === '#hire' || hash === '#employer') {
+        setIsEmployerOpen(true);
+      }
+    };
+
+    handleRoute();
+    window.addEventListener('hashchange', handleRoute);
+    window.addEventListener('popstate', handleRoute);
+    return () => {
+      window.removeEventListener('hashchange', handleRoute);
+      window.removeEventListener('popstate', handleRoute);
+    };
+  }, []);
   
   // Toast Notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);

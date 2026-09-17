@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
   CheckCircle2, 
@@ -25,8 +25,17 @@ import {
   EyeOff
 } from 'lucide-react';
 import { Language, translations } from '../translations';
-import { StageNumber } from '../types';
+import { StageNumber, STAGE_NAMES } from '../types';
 import { CountryFlag } from './CountryFlag';
+import { 
+  apiFetchTracker,
+  getCandidateByPassportOrToken,
+  generateCandidateTimeline,
+  maskCandidateName,
+  maskPassportNumber,
+  maskPhoneNumber,
+  safeJsonFetch
+} from '../services/apiService';
 
 interface CandidateData {
   id: string;
@@ -51,6 +60,8 @@ interface TimelineItem {
   isCurrent: boolean;
   remarks: string;
 }
+
+type LookupStatus = 'isIdle' | 'isLoading' | 'isSuccess' | 'isNotFound';
 
 interface HeroSectionProps {
   lang: Language;
@@ -191,15 +202,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const t = translations[lang];
   const [passportInput, setPassportInput] = useState('');
   const [showPassportInput, setShowPassportInput] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  // Strict non-conflicting lookup states: 'isIdle' | 'isLoading' | 'isSuccess' | 'isNotFound'
+  const [lookupStatus, setLookupStatus] = useState<LookupStatus>('isIdle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [candidateData, setCandidateData] = useState<CandidateData | null>(null);
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  
   const [selectedStage, setSelectedStage] = useState<StageNumber | null>(null);
   const [timelineExpanded, setTimelineExpanded] = useState(true);
   const [hoveredStage, setHoveredStage] = useState<StageNumber | null>(null);
   const [activeTooltipStage, setActiveTooltipStage] = useState<StageNumber | null>(null);
   const [expandedGuideStages, setExpandedGuideStages] = useState<Record<number, boolean>>({});
+
+  const searchTimerRef = useRef<any>(null);
 
   const toggleStageGuide = (stageNum: number) => {
     setExpandedGuideStages(prev => ({
@@ -214,71 +230,119 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     const formatted = rawVal.replace(/[^a-zA-Z0-9-\s]/g, '').toUpperCase().slice(0, 15);
     setPassportInput(formatted);
 
-    // When the user clears the input box, immediately unmount the status card and reset the tracker to its default clean view
+    // When the user clears the input box, immediately unmount the status card and reset the tracker to clean idle view
     if (!formatted.trim()) {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+      setLookupStatus('isIdle');
       setCandidateData(null);
       setTimeline([]);
       setSelectedStage(null);
-      setError(null);
+      setErrorMessage(null);
       setActiveTooltipStage(null);
     }
   };
 
   const handleClear = () => {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
     setPassportInput('');
+    setLookupStatus('isIdle');
     setCandidateData(null);
     setTimeline([]);
     setSelectedStage(null);
-    setError(null);
+    setErrorMessage(null);
     setActiveTooltipStage(null);
   };
 
-  // Function to query passport tracker API
-  const handleTrackPassport = async (queryNumber?: string) => {
-    const num = (queryNumber || passportInput).trim().toUpperCase();
-    if (!num) return;
+  // Strict search trigger: runs only when explicitly called via form submission or button click
+  const performTrackSearch = (targetQuery?: string) => {
+    const query = (targetQuery !== undefined ? targetQuery : passportInput).trim().toUpperCase();
+    if (!query) return;
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch(`/api/tracker/${encodeURIComponent(num)}`);
-      if (!res.ok) {
-        if (res.status === 404) {
-          setError(`No record found for "${num}". Please check your passport or token ID.`);
-          setCandidateData(null);
-          setTimeline([]);
-          setSelectedStage(null);
-          setActiveTooltipStage(null);
-          setExpandedGuideStages({});
-        } else {
-          setError('Failed to fetch tracking data. Please try again.');
-        }
-        setLoading(false);
-        return;
-      }
-
-      const data = await res.json();
-      setCandidateData(data.candidate);
-      setTimeline(data.timeline || []);
-      setSelectedStage(data.candidate.currentStage);
-      setExpandedGuideStages({ [data.candidate.currentStage]: true });
-      setActiveTooltipStage(null);
-      setPassportInput(num);
-    } catch (err: any) {
-      setError('Connection error. Could not query tracking service.');
-    } finally {
-      setLoading(false);
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
     }
+
+    setLookupStatus('isLoading');
+    setErrorMessage(null);
+
+    // Single fixed duration of 600ms verification simulation
+    searchTimerRef.current = setTimeout(async () => {
+      try {
+        // 1. Synchronized direct query from candidate store (tice_candidates_data)
+        const record = getCandidateByPassportOrToken(query);
+        if (record) {
+          const generatedTimeline = generateCandidateTimeline(record);
+          setCandidateData({
+            id: record.id,
+            fullName: maskCandidateName(record.fullName),
+            phone: maskPhoneNumber(record.phone),
+            passportNumber: maskPassportNumber(record.passportNumber || (record as any).passport),
+            trade: record.trade,
+            targetCountry: record.targetCountry,
+            interviewCity: record.interviewCity || 'Delhi',
+            currentStage: record.currentStage,
+            currentStageName: STAGE_NAMES[record.currentStage as StageNumber] || `Stage ${record.currentStage}`,
+            remarks: record.remarks || 'Document verification underway.',
+            createdAt: record.createdAt,
+            updatedAt: record.updatedAt
+          });
+          setTimeline(generatedTimeline);
+          setSelectedStage(record.currentStage);
+          setExpandedGuideStages({ [record.currentStage]: true });
+          setActiveTooltipStage(null);
+          setLookupStatus('isSuccess');
+          return;
+        }
+
+        // 2. Query server API once if not found in local state
+        const res = await safeJsonFetch(`/api/tracker/${encodeURIComponent(query)}`);
+        if (res.ok && res.data && res.data.candidate) {
+          setCandidateData(res.data.candidate);
+          setTimeline(res.data.timeline || []);
+          setSelectedStage(res.data.candidate.currentStage);
+          setExpandedGuideStages({ [res.data.candidate.currentStage]: true });
+          setActiveTooltipStage(null);
+          setLookupStatus('isSuccess');
+          return;
+        }
+
+        // 3. Not found
+        setCandidateData(null);
+        setTimeline([]);
+        setSelectedStage(null);
+        setActiveTooltipStage(null);
+        setErrorMessage(`No record found for "${query}". Please check your passport number or token ID.`);
+        setLookupStatus('isNotFound');
+      } catch (err: any) {
+        setCandidateData(null);
+        setTimeline([]);
+        setErrorMessage('Verification service is temporarily unreachable. Please try again.');
+        setLookupStatus('isNotFound');
+      }
+    }, 600);
   };
 
-  // React to prefilledPassport changes from external triggers (e.g. registration success)
+  // React strictly to external triggers (e.g. registration success redirect)
   useEffect(() => {
-    if (prefilledPassport) {
-      setPassportInput(prefilledPassport);
-      handleTrackPassport(prefilledPassport);
+    if (prefilledPassport && prefilledPassport.trim()) {
+      const clean = prefilledPassport.trim().toUpperCase();
+      setPassportInput(clean);
+      performTrackSearch(clean);
     }
   }, [prefilledPassport]);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleScrollClick = () => {
     if (onScrollToJobs) {
@@ -450,7 +514,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div id="passport-tracker-card" className="bg-slate-900/95 backdrop-blur-md shadow-2xl border border-white/20 rounded-3xl p-6 sm:p-7 relative overflow-hidden">
               
               {/* Subtle Indeterminate Top Shimmer Line on Active Query */}
-              {loading && (
+              {lookupStatus === 'isLoading' && (
                 <div className="absolute top-0 left-0 right-0 h-1 bg-slate-800/80 overflow-hidden z-20">
                   <div className="h-full bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 w-1/2 animate-shimmer" />
                 </div>
@@ -478,7 +542,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleTrackPassport();
+                  performTrackSearch();
                 }}
                 autoComplete="off"
                 autoCorrect="off"
@@ -525,10 +589,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     <button
                       id="btn-submit-track"
                       type="submit"
-                      disabled={loading || !passportInput.trim()}
+                      disabled={lookupStatus === 'isLoading' || !passportInput.trim()}
                       className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {loading ? (
+                      {lookupStatus === 'isLoading' ? (
                         <span className="inline-flex items-center gap-1.5">
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-950" />
                           <span>Checking...</span>
@@ -547,8 +611,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </form>
 
-              {/* Default Clean View when tracker is idle / unmounted */}
-              {!loading && !candidateData && !error && (
+              {/* Default Clean View when tracker is idle */}
+              {lookupStatus === 'isIdle' && (
                 <div className="mt-5 pt-4 border-t border-slate-800/80">
                   <div className="p-4 rounded-2xl bg-slate-950/40 border border-dashed border-slate-800 text-center space-y-1.5">
                     <div className="flex items-center justify-center gap-2 text-slate-300 font-medium text-xs">
@@ -562,8 +626,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               )}
 
-              {/* SKELETON LOADER: Displayed while querying API */}
-              {loading && (
+              {/* SKELETON LOADER: Displayed solely during active 600ms loading */}
+              {lookupStatus === 'isLoading' && (
                 <div 
                   id="tracker-skeleton-loader" 
                   className="mt-6 pt-5 border-t border-slate-800/80 space-y-5 animate-in fade-in duration-200"
@@ -620,7 +684,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
                       <div className="grid grid-cols-7 gap-1 relative z-10">
                         {[1, 2, 3, 4, 5, 6, 7].map((step) => (
-                          <div key={step} className="flex flex-col items-center text-center">
+                          <div key={`skeleton-step-${step}`} className="flex flex-col items-center text-center">
                             <div className="w-8 h-8 rounded-full bg-slate-800/90 border border-slate-700/70 flex items-center justify-center shadow-xs animate-pulse">
                               <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
                             </div>
@@ -647,15 +711,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               )}
 
               {/* Error Message */}
-              {!loading && error && (
+              {lookupStatus === 'isNotFound' && errorMessage && (
                 <div className="mt-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                  <span>{error}</span>
+                  <span>{errorMessage}</span>
                 </div>
               )}
 
               {/* Candidate Info & Visual Step-by-Step Progress Timeline */}
-              {!loading && candidateData && (
+              {lookupStatus === 'isSuccess' && candidateData && (
                 <div className="mt-6 pt-5 border-t border-slate-800/80 space-y-5 animate-in fade-in duration-300">
                   
                   {/* Candidate Profile Details Bar */}
@@ -752,7 +816,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
                           return (
                             <div 
-                              key={stageNum}
+                              key={`stepper-stage-${stageNum}`}
                               className="relative flex flex-col items-center"
                               onMouseEnter={() => setHoveredStage(stageNum)}
                               onMouseLeave={() => setHoveredStage(null)}
@@ -946,7 +1010,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         if (!timelineExpanded && !isCurrent && !isSelected) {
                           return (
                             <div 
-                              key={stageNum}
+                              key={`timeline-collapsed-${stageNum}`}
                               onClick={() => setSelectedStage(stageNum)}
                               className={`flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer transition ${
                                 isCompleted 
@@ -971,7 +1035,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
                         return (
                           <div 
-                            key={stageNum}
+                            key={`timeline-stage-${stageNum}`}
                             onClick={() => setSelectedStage(stageNum)}
                             className={`relative rounded-2xl p-3.5 sm:p-4 border transition-all ${
                               isCurrent

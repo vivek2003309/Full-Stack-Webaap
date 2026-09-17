@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Building2, Mail, Phone, Users, Globe2, CheckCircle2, Shield, Loader2, Send, Tag, Briefcase } from 'lucide-react';
+import { apiSubmitEnquiry } from '../services/apiService';
 
 interface EmployerEnquiryModalProps {
   isOpen: boolean;
@@ -92,29 +93,24 @@ export const EmployerEnquiryModal: React.FC<EmployerEnquiryModalProps> = ({ isOp
     ].filter(Boolean).join('\n\n');
 
     try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: "Workforce Quota Request",
-          companyName: companyName.trim(),
-          contactPerson: contactPerson.trim(),
-          fullName: contactPerson.trim(),
-          designation: designation.trim() || undefined,
-          phone: phone.trim(),
-          email: email.trim() || undefined,
-          destinationCountry,
-          locationOrCountry: `${destinationCountry}`,
-          requiredTrades: selectedTrades,
-          tradesOrSubject: selectedTrades.join(', '),
-          headcount: Number(headcount),
-          message: messageCombined
-        })
+      const result = await apiSubmitEnquiry({
+        type: "Workforce Quota Request",
+        companyName: companyName.trim(),
+        contactPerson: contactPerson.trim(),
+        fullName: contactPerson.trim(),
+        designation: designation.trim() || undefined,
+        phone: phone.trim(),
+        email: email.trim() || undefined,
+        destinationCountry,
+        locationOrCountry: `${destinationCountry}`,
+        requiredTrades: selectedTrades,
+        tradesOrSubject: selectedTrades.join(', '),
+        headcount: Number(headcount),
+        message: messageCombined
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || data.error || 'Failed to submit workforce quota request');
+      if (!result || !result.success) {
+        throw new Error(result?.message || 'Failed to submit workforce quota request');
       }
 
       setLoading(false);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Send, Phone, Mail, MapPin, MessageSquare, CheckCircle2, Shield, Loader2, Sparkles, HelpCircle } from 'lucide-react';
 import { Language } from '../translations';
+import { apiSubmitEnquiry } from '../services/apiService';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -39,25 +40,20 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, onS
     setError(null);
 
     try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: "Contact Enquiry",
-          fullName: fullName.trim(),
-          phone: phone.trim(),
-          email: email.trim() || undefined,
-          tradesOrSubject: enquiryType,
-          enquiryType,
-          locationOrCountry: city.trim(),
-          city: city.trim(),
-          message: message.trim() || undefined
-        })
+      const result = await apiSubmitEnquiry({
+        type: "Contact Enquiry",
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        email: email.trim() || undefined,
+        tradesOrSubject: enquiryType,
+        enquiryType,
+        locationOrCountry: city.trim(),
+        city: city.trim(),
+        message: message.trim() || undefined
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || data.error || 'Failed to submit enquiry');
+      if (!result || !result.success) {
+        throw new Error(result?.message || 'Failed to submit enquiry');
       }
 
       // Reset form
@@ -71,7 +67,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, onS
       onClose();
 
       if (onSuccessToast) {
-        onSuccessToast("Enquiry submitted successfully! Our Janakpuri desk will contact you shortly.");
+        onSuccessToast(result.message || "Enquiry submitted successfully! Our Janakpuri desk will contact you shortly.");
       }
     } catch (err: any) {
       setError(err.message || 'Submission error. Please check your connection.');

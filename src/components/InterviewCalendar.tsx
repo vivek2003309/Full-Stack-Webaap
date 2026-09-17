@@ -3,6 +3,7 @@ import { Calendar, MapPin, Users, ArrowRight, Clock, Building, CheckCircle } fro
 import { InterviewDrive } from '../types';
 import { Language, translations } from '../translations';
 import { CountryFlag } from './CountryFlag';
+import { apiFetchDrives, INITIAL_DRIVES, getStoredDrives } from '../services/apiService';
 
 interface InterviewCalendarProps {
   lang: Language;
@@ -11,20 +12,58 @@ interface InterviewCalendarProps {
 
 export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRegisterDrive }) => {
   const t = translations[lang];
-  const [drives, setDrives] = useState<InterviewDrive[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with seed/cached data immediately so cards are visible with zero flicker
+  const [drives, setDrives] = useState<InterviewDrive[]>(() => {
+    try {
+      const stored = getStoredDrives();
+      return stored && stored.length > 0 ? stored : INITIAL_DRIVES;
+    } catch {
+      return INITIAL_DRIVES;
+    }
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/drives')
-      .then(res => res.json())
-      .then(data => {
-        setDrives(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching drives:', err);
-        setLoading(false);
-      });
+    let isMounted = true;
+
+    const fetchDrivesOnce = async () => {
+      try {
+        const data = await apiFetchDrives();
+        if (isMounted && data && Array.isArray(data) && data.length > 0) {
+          setDrives(data);
+        }
+      } catch (err) {
+        console.warn('Error fetching drives silently:', err);
+      }
+    };
+
+    fetchDrivesOnce();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Silent sync when data updates from admin without triggering loading skeletons
+  useEffect(() => {
+    let isMounted = true;
+    const handleDataChange = () => {
+      if (!isMounted) return;
+      try {
+        const updated = getStoredDrives();
+        if (updated && updated.length > 0) {
+          setDrives(updated);
+        }
+      } catch (err) {
+        console.warn('Silent drive update failed:', err);
+      }
+    };
+
+    window.addEventListener('tice_data_changed', handleDataChange);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('tice_data_changed', handleDataChange);
+    };
   }, []);
 
   return (
@@ -51,7 +90,7 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
         </div>
 
         {/* Drives Grid / Skeleton */}
-        {loading ? (
+        {isLoading && drives.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6" aria-busy="true" aria-label="Loading walk-in interview schedule">
             {[1, 2, 3].map((idx) => (
               <div
