@@ -5,6 +5,8 @@ import { Job } from '../types';
 import { Language, translations } from '../translations';
 import { CountryFlag } from './CountryFlag';
 import { apiFetchJobs, INITIAL_JOBS, getStoredJobs } from '../services/apiService';
+import { onSnapshot, collection } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface JobBoardProps {
   lang: Language;
@@ -56,13 +58,15 @@ export const JobBoard: React.FC<JobBoardProps> = ({
   const fetchJobs = async (showSkeleton = false) => {
     if (showSkeleton) setLoading(true);
     try {
-      const data = await apiFetchJobs({
+      const res = await apiFetchJobs({
         country: selectedCountry,
         trade: selectedTrade
       });
-      setJobs(data);
+      const jobList = Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : []);
+      setJobs(jobList);
     } catch (err) {
       console.error('Failed to load jobs:', err);
+      setJobs((prev) => (Array.isArray(prev) && prev.length > 0 ? prev : INITIAL_JOBS));
     } finally {
       if (showSkeleton) setLoading(false);
     }
@@ -79,9 +83,18 @@ export const JobBoard: React.FC<JobBoardProps> = ({
     };
     window.addEventListener('jobsUpdated', handleJobsUpdated);
     window.addEventListener('tice_data_changed', handleJobsUpdated);
+
+    // Direct Firestore real-time listener on collection "jobs"
+    const unsub = onSnapshot(collection(db, 'jobs'), (snap) => {
+      if (!snap.empty) {
+        fetchJobs(false);
+      }
+    }, (err) => console.warn('JobBoard onSnapshot warning:', err));
+
     return () => {
       window.removeEventListener('jobsUpdated', handleJobsUpdated);
       window.removeEventListener('tice_data_changed', handleJobsUpdated);
+      unsub();
     };
   }, [selectedCountry, selectedTrade]);
 
@@ -232,7 +245,7 @@ export const JobBoard: React.FC<JobBoardProps> = ({
               </div>
             ))}
           </div>
-        ) : jobs.length === 0 ? (
+        ) : (!Array.isArray(jobs) || jobs.length === 0) ? (
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-dashed border-slate-300 dark:border-slate-800">
             <Briefcase className="w-12 h-12 text-slate-400 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">No vacancies match current filter criteria</h3>
@@ -252,7 +265,7 @@ export const JobBoard: React.FC<JobBoardProps> = ({
         ) : (
           /* Jobs Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {jobs.map((job, idx) => (
+            {(Array.isArray(jobs) ? jobs : []).map((job, idx) => (
               <motion.div
                 key={job.id}
                 initial={{ opacity: 0, y: 24 }}

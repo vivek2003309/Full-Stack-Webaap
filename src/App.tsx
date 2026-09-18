@@ -5,12 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import { TopBar } from './components/TopBar';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { JobBoard } from './components/JobBoard';
 import { CareerGuidance } from './components/CareerGuidance';
 import { InterviewCalendar } from './components/InterviewCalendar';
+import { UpcomingTradeTestScheduleTicker } from './components/UpcomingTradeTestScheduleTicker';
 import { InfrastructureShowcase } from './components/InfrastructureShowcase';
 import { TestimonialsAndStats } from './components/TestimonialsAndStats';
 import { Footer } from './components/Footer';
@@ -19,6 +21,7 @@ import { ApplicationModal } from './components/ApplicationModal';
 import { EmployerEnquiryModal } from './components/EmployerEnquiryModal';
 import { ContactModal } from './components/ContactModal';
 import { AdminPortalModal } from './components/AdminPortalModal';
+import { CandidateDashboardModal } from './components/CandidateDashboardModal';
 import { FloatingWhatsAppButton } from './components/FloatingWhatsAppButton';
 import { Preloader } from './components/Preloader';
 import { CheckCircle2, X } from 'lucide-react';
@@ -34,6 +37,8 @@ export default function App() {
   const [isEmployerOpen, setIsEmployerOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
+  const [isCandidateDashboardOpen, setIsCandidateDashboardOpen] = useState(false);
+  const [candidateDashboardPassport, setCandidateDashboardPassport] = useState<string | null>(null);
 
   // Synchronize hash & path routes (e.g. /admin or #admin)
   useEffect(() => {
@@ -49,6 +54,8 @@ export default function App() {
         setIsContactOpen(true);
       } else if (hash === '#hire' || hash === '#employer') {
         setIsEmployerOpen(true);
+      } else if (hash === '#candidate' || hash === '#dashboard' || hash === '#status' || path.includes('/candidate')) {
+        setIsCandidateDashboardOpen(true);
       }
     };
 
@@ -136,7 +143,11 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex flex-col selection:bg-amber-500 selection:text-slate-950 transition-colors duration-200">
+      <AuthProvider>
+        <div 
+          dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex flex-col selection:bg-amber-500 selection:text-slate-950 transition-colors duration-200"
+        >
         {/* High-End Brand Preloader Screen */}
         <Preloader />
       
@@ -170,6 +181,10 @@ export default function App() {
         setLang={setLang}
         onOpenLicense={() => setIsLicenseOpen(true)}
         onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenCandidatePortal={() => {
+          setCandidateDashboardPassport(null);
+          setIsCandidateDashboardOpen(true);
+        }}
       />
 
       {/* 2. Navigation Header */}
@@ -181,6 +196,10 @@ export default function App() {
         onOpenContactModal={() => setIsContactOpen(true)}
         onOpenLicense={() => setIsLicenseOpen(true)}
         onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenCandidatePortal={() => {
+          setCandidateDashboardPassport(null);
+          setIsCandidateDashboardOpen(true);
+        }}
         onScrollToJobs={handleScrollToJobs}
       />
 
@@ -191,6 +210,10 @@ export default function App() {
         onOpenLicense={() => setIsLicenseOpen(true)}
         prefilledPassport={prefilledPassport}
         onSelectDriveTrade={handleSelectDriveTrade}
+        onOpenCandidateDashboard={(passport) => {
+          setCandidateDashboardPassport(passport || null);
+          setIsCandidateDashboardOpen(true);
+        }}
       />
 
       {/* 4. Active Overseas Jobs Board */}
@@ -204,6 +227,12 @@ export default function App() {
       {/* 5. Career Guidance & Interview Preparation Tips */}
       <CareerGuidance 
         lang={lang}
+      />
+
+      {/* 5B. Upcoming Practical Trade Test & Client Walk-In Schedule Ticker */}
+      <UpcomingTradeTestScheduleTicker
+        lang={lang}
+        onRegisterDrive={handleRegisterDrive}
       />
 
       {/* 6. Client Walk-In Interview Calendar */}
@@ -279,6 +308,24 @@ export default function App() {
         />
       )}
 
+      {/* Candidate Application & Document Dashboard Modal */}
+      {isCandidateDashboardOpen && (
+        <CandidateDashboardModal 
+          isOpen={isCandidateDashboardOpen}
+          onClose={() => setIsCandidateDashboardOpen(false)}
+          lang={lang}
+          initialPassport={candidateDashboardPassport}
+          onApplyNew={() => {
+            setIsCandidateDashboardOpen(false);
+            handleScrollToJobs();
+          }}
+          onBrowseJobs={() => {
+            setIsCandidateDashboardOpen(false);
+            handleScrollToJobs();
+          }}
+        />
+      )}
+
       {/* Admin Management Portal & API Explorer */}
       {isAdminOpen && (
         <AdminPortalModal 
@@ -298,6 +345,7 @@ export default function App() {
       <FloatingWhatsAppButton lang={lang} />
 
     </div>
+    </AuthProvider>
     </ThemeProvider>
   );
 }

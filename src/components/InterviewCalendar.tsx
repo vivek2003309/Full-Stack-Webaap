@@ -29,9 +29,10 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
 
     const fetchDrivesOnce = async () => {
       try {
-        const data = await apiFetchDrives();
-        if (isMounted && data && Array.isArray(data) && data.length > 0) {
-          setDrives(data);
+        const res = await apiFetchDrives();
+        const list = Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : []);
+        if (isMounted && list.length > 0) {
+          setDrives(list);
         }
       } catch (err) {
         console.warn('Error fetching drives silently:', err);
@@ -148,7 +149,7 @@ export const InterviewCalendar: React.FC<InterviewCalendarProps> = ({ lang, onRe
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {drives.map((drive, index) => (
+            {(Array.isArray(drives) ? drives : []).map((drive, index) => (
               <motion.div
                 key={drive.id}
                 initial={{ opacity: 0, y: 28 }}

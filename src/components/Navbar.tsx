@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Menu, X, Users, Briefcase, Lock, ChevronRight } from 'lucide-react';
+import { Menu, X, Users, Briefcase, Lock, ChevronRight, LogOut, UserCheck, ShieldAlert } from 'lucide-react';
 import { Language, translations } from '../translations';
+import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
   lang: Language;
@@ -11,6 +12,7 @@ interface NavbarProps {
   onScrollToJobs?: () => void;
   onOpenAdmin?: () => void;
   onOpenLicense: () => void;
+  onOpenCandidatePortal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -21,11 +23,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenContactModal,
   onScrollToJobs,
   onOpenAdmin,
-  onOpenLicense
+  onOpenLicense,
+  onOpenCandidatePortal
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [internalMode, setInternalMode] = useState<'seeker' | 'employer'>(userMode);
   const t = translations[lang];
+  const { candidateUser, adminUser, isAdminAuthenticated, isCandidateAuthenticated, logoutCandidate, logoutAdmin } = useAuth();
 
   const activeMode = userMode ?? internalMode;
 
@@ -70,21 +74,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-200">
             <a href="#about-us" className="hover:text-amber-400 transition-colors">{t.aboutUs}</a>
-            <a 
-              href="#sectors" 
-              onClick={() => handleModeChange('employer')}
-              className={`hover:text-amber-400 transition-colors ${activeMode === 'employer' ? 'text-amber-400 font-semibold' : ''}`}
-            >
-              {t.forEmployers}
-            </a>
-            <a 
-              href="#jobs" 
-              onClick={() => handleModeChange('seeker')}
-              className={`hover:text-amber-400 transition-colors ${activeMode === 'seeker' ? 'text-amber-400 font-semibold' : ''}`}
-            >
-              {t.jobSeekers}
-            </a>
             <a href="#infrastructure" className="hover:text-amber-400 transition-colors">{t.tradeTestCenters}</a>
+            
+            {onOpenCandidatePortal && (
+              <button
+                id="btn-nav-candidate-dashboard"
+                onClick={onOpenCandidatePortal}
+                className="text-amber-300 hover:text-amber-200 transition-colors cursor-pointer text-sm font-semibold flex items-center gap-1.5"
+              >
+                <UserCheck className="w-4 h-4 text-amber-400" />
+                <span>
+                  {isCandidateAuthenticated ? (candidateUser?.passport || 'My Portal') : t.candidatePortal}
+                </span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 if (onOpenContactModal) {
@@ -146,27 +150,57 @@ export const Navbar: React.FC<NavbarProps> = ({
               {t.hireManpower}
             </button>
 
-            {/* Admin Key button */}
-            <button
-              id="btn-nav-admin"
-              onClick={onOpenAdmin}
-              className="p-2 rounded-xl text-slate-300 hover:text-amber-400 hover:bg-slate-800/80 border border-slate-700 transition cursor-pointer"
-              title="Admin Portal Login"
-            >
-              <Lock className="w-4 h-4" />
-            </button>
+            {/* Admin Key button or Active Admin Chip */}
+            {isAdminAuthenticated ? (
+              <div className="flex items-center gap-1 pl-2.5 pr-1 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs">
+                <button
+                  onClick={onOpenAdmin}
+                  className="text-amber-300 hover:text-amber-200 font-semibold flex items-center gap-1 cursor-pointer"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Admin</span>
+                </button>
+                <button
+                  onClick={() => logoutAdmin()}
+                  className="p-1 text-slate-400 hover:text-red-400 rounded cursor-pointer"
+                  title="Sign Out Admin"
+                >
+                  <LogOut className="w-3 h-3" />
+                </button>
+              </div>
+            ) : (
+              <button
+                id="btn-nav-admin"
+                onClick={onOpenAdmin}
+                className="p-2 rounded-xl text-slate-300 hover:text-amber-400 hover:bg-slate-800/80 border border-slate-700 transition cursor-pointer"
+                title="Admin Portal Login"
+              >
+                <Lock className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 md:hidden">
-            <button
-              id="btn-mobile-admin"
-              onClick={onOpenAdmin}
-              className="p-2 rounded-lg text-slate-300 hover:text-amber-400 bg-slate-800/80 border border-slate-700"
-              title="Admin Portal"
-            >
-              <Lock className="w-4 h-4" />
-            </button>
+            {isAdminAuthenticated ? (
+              <button
+                onClick={onOpenAdmin}
+                className="px-2 py-1 rounded-lg text-amber-300 bg-amber-500/20 border border-amber-500/40 text-xs font-semibold flex items-center gap-1"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                <span>Admin</span>
+              </button>
+            ) : (
+              <button
+                id="btn-mobile-admin"
+                onClick={onOpenAdmin}
+                className="p-2 rounded-lg text-slate-300 hover:text-amber-400 bg-slate-800/80 border border-slate-700"
+                title="Admin Portal"
+              >
+                <Lock className="w-4 h-4" />
+              </button>
+            )}
+
             <button
               id="btn-mobile-menu"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -240,6 +274,25 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               {t.tradeTestCenters}
             </a>
+
+            {onOpenCandidatePortal && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenCandidatePortal();
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-amber-300 font-semibold flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-amber-400" />
+                  <span>
+                    {isCandidateAuthenticated ? `Candidate: ${candidateUser?.passport}` : t.candidatePortal}
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400" />
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
@@ -253,6 +306,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               {t.contact}
             </button>
+
             <button
               onClick={() => {
                 onOpenLicense();
@@ -263,6 +317,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>{t.verifyLicense}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
+
+            {isAdminAuthenticated && (
+              <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-3 py-2 bg-amber-500/10 rounded-lg">
+                <span className="text-xs text-amber-300 font-medium">Signed in as Admin</span>
+                <button
+                  onClick={() => {
+                    logoutAdmin();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 font-bold flex items-center gap-1"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 pt-2">

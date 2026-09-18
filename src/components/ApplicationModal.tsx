@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, User, Phone, FileText, MapPin, Globe, Sparkles, AlertCircle } from 'lucide-react';
+import { X, CheckCircle2, User, Phone, FileText, MapPin, Globe, Sparkles, AlertCircle, Printer, FileCheck } from 'lucide-react';
 import { Job, InterviewDrive } from '../types';
-import { apiSubmitApplication } from '../services/apiService';
+import { apiSubmitApplication, sanitizeFirestorePayload } from '../services/apiService';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { WalkInPassModal } from './WalkInPassModal';
+
+// Standard alphanumeric passport formatting: 1 letter followed by 7 digits (e.g. P1234567)
+const PASSPORT_REGEX = /^[A-Z][0-9]{7}$/;
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -37,6 +43,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<{ id: string; passportNumber: string; rawPassport: string } | null>(null);
+  const [showWalkInPass, setShowWalkInPass] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,30 +71,86 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       return;
     }
 
+    const passportClean = passportNumber.trim().toUpperCase();
+
+    // Client-side regex validation: 1 letter followed by 7 digits (e.g., P1234567)
+    if (!PASSPORT_REGEX.test(passportClean)) {
+      setError('Invalid passport number format. Must be 1 letter followed by 7 digits (e.g. P1234567).');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
-    const formattedPassport = passportNumber.trim().toUpperCase();
+    const cleanToken = "TIC-" + passportClean.slice(-4);
+    const candidateName = fullName.trim();
+    const candidateTrade = trade || selectedJob?.title || selectedDrive?.tradesAllowed[0] || "Applicant";
+    const candidateCountry = targetCountry || selectedJob?.country || selectedDrive?.countryDestination || "Overseas";
+    const candidateRemarks = remarks.trim() || (selectedJob ? ("Applied online for " + (selectedJob.title || "Job")) : "Applied online through TICE portal");
+    const now = new Date().toISOString();
+
+    const candidatePayload = {
+      id: passportClean,
+      token: cleanToken,
+      name: candidateName,
+      fullName: candidateName,
+      passportNumber: passportClean,
+      trade: candidateTrade,
+      country: candidateCountry,
+      targetCountry: candidateCountry,
+      currentStage: 1,
+      stageName: "Application Registered",
+      remarks: candidateRemarks,
+      appliedDate: now,
+      createdAt: now,
+      updatedAt: now,
+      phone: phone.trim(),
+      interviewCity: interviewCity || 'Delhi'
+    };
 
     try {
-      const data = await apiSubmitApplication({
-        fullName,
-        phone,
-        passportNumber: formattedPassport,
-        trade,
-        targetCountry,
-        interviewCity,
-        remarks
+      // 1. Direct Firestore write to candidates collection using standardized schema
+      await setDoc(doc(db, "candidates", passportClean), sanitizeFirestorePayload(candidatePayload), { merge: true }).catch(err => {
+        console.warn("Direct Firestore candidates write warning:", err);
       });
-
-      if (!data || !data.success || !data.application) {
-        throw new Error(data?.message || 'Failed to submit application');
+      if (cleanToken !== passportClean) {
+        await setDoc(doc(db, "candidates", cleanToken), sanitizeFirestorePayload(candidatePayload), { merge: true }).catch(() => null);
       }
 
+      // 2. Also save a reference into enquiries collection
+      const enqId = `ENQ-${Math.floor(1000 + Math.random() * 9000)}`;
+      const enquiryPayload = {
+        id: enqId,
+        type: "Job Application",
+        fullName: candidateName,
+        phone: phone.trim(),
+        email: "",
+        locationOrCountry: candidateCountry,
+        tradesOrSubject: candidateTrade,
+        headcount: 1,
+        message: `${candidateRemarks} [Passport: ${passportClean}, Token: ${cleanToken}]`,
+        status: "New",
+        createdAt: now,
+        updatedAt: now
+      };
+      await setDoc(doc(db, "enquiries", enqId), sanitizeFirestorePayload(enquiryPayload), { merge: true }).catch(() => null);
+
+      // 3. Keep local cache and background handlers synchronized
+      const data = await apiSubmitApplication({
+        fullName: candidateName,
+        phone: phone.trim(),
+        passportNumber: passportClean,
+        trade: candidateTrade,
+        targetCountry: candidateCountry,
+        interviewCity,
+        customToken: cleanToken,
+        remarks: candidateRemarks
+      });
+
       setSubmittedData({
-        id: data.application.id,
-        passportNumber: data.application.passportNumber,
-        rawPassport: formattedPassport
+        id: cleanToken,
+        passportNumber: passportClean,
+        rawPassport: passportClean
       });
     } catch (err: any) {
       setError(err.message || 'Error communicating with server.');
@@ -148,19 +211,30 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
               </div>
             </div>
 
-            <div className="pt-2 flex flex-col sm:flex-row gap-2">
+            <div className="pt-2 flex flex-col gap-2">
               <button
-                onClick={handleTrackNow}
-                className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition cursor-pointer"
+                type="button"
+                onClick={() => setShowWalkInPass(true)}
+                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-500/40 font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
               >
-                Track Live Status in Portal
+                <Printer className="w-4 h-4 text-amber-400" />
+                <span>Generate Walk-in Pass / Interview Slip</span>
               </button>
-              <button
-                onClick={onClose}
-                className="py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
-              >
-                Done
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button
+                  onClick={handleTrackNow}
+                  className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition cursor-pointer"
+                >
+                  Track Live Status in Portal
+                </button>
+                <button
+                  onClick={onClose}
+                  className="py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -225,22 +299,48 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Passport Number *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700 dark:text-slate-300">
+                      Passport Number *
+                    </label>
+                    {passportNumber.trim() && (
+                      <span className={`text-[10px] font-semibold ${
+                        PASSPORT_REGEX.test(passportNumber.trim().toUpperCase())
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : passportNumber.length === 8
+                          ? 'text-rose-500'
+                          : 'text-slate-400'
+                      }`}>
+                        {PASSPORT_REGEX.test(passportNumber.trim().toUpperCase())
+                          ? '✓ Valid Passport Format'
+                          : `${passportNumber.length}/8 chars`}
+                      </span>
+                    )}
+                  </div>
                   <div className="relative">
                     <input
                       type="text"
                       required
+                      maxLength={8}
+                      pattern="^[A-Za-z][0-9]{7}$"
+                      title="1 letter followed by 7 digits (e.g. P1234567)"
                       value={passportNumber}
-                      onChange={(e) => setPassportNumber(e.target.value.toUpperCase())}
+                      onChange={(e) => {
+                        setPassportNumber(e.target.value.toUpperCase().replace(/\s/g, ''));
+                        if (error) setError(null);
+                      }}
                       placeholder="e.g. P1234567"
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 rounded-xl py-2.5 pl-9 pr-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-xs uppercase"
+                      className={`w-full bg-slate-50 dark:bg-slate-950 border ${
+                        passportNumber.length === 8 && !PASSPORT_REGEX.test(passportNumber.trim().toUpperCase())
+                          ? 'border-rose-400 dark:border-rose-500/70 focus:border-rose-500 focus:ring-rose-500/20'
+                          : 'border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-amber-500/20'
+                      } rounded-xl py-2.5 pl-9 pr-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 text-xs uppercase`}
                     />
                     <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   </div>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                    <span>🔒 Protected: Masked across public trackers for candidate safety.</span>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-between">
+                    <span>Format: 1 letter followed by 7 digits (e.g. P1234567)</span>
+                    <span className="hidden sm:inline">🔒 Protected</span>
                   </p>
                 </div>
               </div>
@@ -335,6 +435,23 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
         )}
 
       </div>
+
+      {showWalkInPass && submittedData && (
+        <WalkInPassModal
+          isOpen={showWalkInPass}
+          onClose={() => setShowWalkInPass(false)}
+          data={{
+            candidateName: fullName || 'Candidate',
+            passportNumber: submittedData.rawPassport || submittedData.passportNumber,
+            tokenId: submittedData.id,
+            trade: trade,
+            targetCountry: targetCountry,
+            reportingDate: 'Monday - Friday (09:30 AM - 01:00 PM)',
+            reportingTime: 'Morning Batch (Slot A)',
+            venue: 'Janakpuri Test Center, New Delhi (TICE Overseas Skill Testing Complex, B-1/16, Community Centre, Janakpuri, New Delhi - 110058)'
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -1,6 +1,35 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
+    <script>
+      // Intercept console.error to filter out Vite's HMR websocket disconnect noise
+      (function () {
+        var origError = console.error;
+        console.error = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var msg = args.map(function (a) { return (a && a.message) || String(a); }).join(' ');
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1 || msg.indexOf('[vite] failed to connect') !== -1) {
+            return; // Silently suppress
+          }
+          origError.apply(console, args);
+        };
+
+        window.addEventListener('unhandledrejection', function (e) {
+          var reason = (e && e.reason) ? (e.reason.message || e.reason.toString()) : '';
+          if (typeof reason === 'string' && (reason.indexOf('WebSocket') !== -1 || reason.indexOf('websocket') !== -1)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        });
+        window.addEventListener('error', function (e) {
+          var msg = (e && e.message) ? e.message : '';
+          if (typeof msg === 'string' && (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        });
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trehan International Consultants & Engineers (TICE)</title>
@@ -18,4 +47,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

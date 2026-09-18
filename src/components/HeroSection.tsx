@@ -30,6 +30,7 @@ import { CountryFlag } from './CountryFlag';
 import { 
   apiFetchTracker,
   getCandidateByPassportOrToken,
+  getCandidateByPassportOrTokenAsync,
   generateCandidateTimeline,
   maskCandidateName,
   maskPassportNumber,
@@ -69,6 +70,7 @@ interface HeroSectionProps {
   onOpenLicense?: () => void;
   onSelectDriveTrade?: (trade: string, country: string) => void;
   prefilledPassport?: string | null;
+  onOpenCandidateDashboard?: (passport?: string) => void;
 }
 
 export interface RecruitmentStageDef {
@@ -197,7 +199,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onScrollToJobs, 
   onOpenLicense, 
   onSelectDriveTrade,
-  prefilledPassport 
+  prefilledPassport,
+  onOpenCandidateDashboard
 }) => {
   const t = translations[lang];
   const [passportInput, setPassportInput] = useState('');
@@ -272,8 +275,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     // Single fixed duration of 600ms verification simulation
     searchTimerRef.current = setTimeout(async () => {
       try {
-        // 1. Synchronized direct query from candidate store (tice_candidates_data)
-        const record = getCandidateByPassportOrToken(query);
+        // 1. Synchronized direct query from candidate store or Firestore (tice_candidates_data)
+        const record = await getCandidateByPassportOrTokenAsync(query);
         if (record) {
           const generatedTimeline = generateCandidateTimeline(record);
           setCandidateData({
@@ -533,9 +536,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     <p className="text-xs text-slate-400">Live Emigration & Consulate Processing Gateway</p>
                   </div>
                 </div>
-                <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  e-Migrate 2.0
-                </span>
+                
+                <div className="flex items-center gap-2">
+                  {onOpenCandidateDashboard && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenCandidateDashboard(passportInput.trim() || undefined)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold transition cursor-pointer"
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>{lang === 'hi' ? 'उम्मीदवार पोर्टल' : 'Candidate Portal'}</span>
+                    </button>
+                  )}
+                  <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    e-Migrate 2.0
+                  </span>
+                </div>
               </div>
 
               {/* Search Input Box */}
@@ -750,14 +766,29 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     </div>
 
                     {/* Status & Progress Percentage Badge */}
-                    <div className="flex flex-col items-end gap-1">
-                      <div className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs ${getStageBadgeStyles(candidateData.currentStage)}`}>
-                        <span className="w-2 h-2 rounded-full bg-current animate-ping" />
-                        <span>Stage {candidateData.currentStage} of 7: {candidateData.currentStageName}</span>
+                    <div className="flex flex-col sm:items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs ${getStageBadgeStyles(candidateData.currentStage)}`}>
+                          <span className="w-2 h-2 rounded-full bg-current animate-ping" />
+                          <span>Stage {candidateData.currentStage} of 7: {candidateData.currentStageName}</span>
+                        </div>
                       </div>
-                      <span className="text-[11px] font-mono text-emerald-400 font-semibold">
-                        {Math.round((candidateData.currentStage / 7) * 100)}% Completed
-                      </span>
+                      
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-mono text-emerald-400 font-semibold">
+                          {Math.round((candidateData.currentStage / 7) * 100)}% Completed
+                        </span>
+                        {onOpenCandidateDashboard && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenCandidateDashboard(passportInput.trim() || undefined)}
+                            className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition cursor-pointer flex items-center gap-1 shadow-xs"
+                          >
+                            <span>Open Full Portal</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 

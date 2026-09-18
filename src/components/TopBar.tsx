@@ -1,6 +1,7 @@
 import React from 'react';
-import { ShieldCheck, PhoneCall, Languages, ExternalLink, Lock } from 'lucide-react';
+import { ShieldCheck, PhoneCall, Languages, ExternalLink, Lock, UserCheck, LogOut, ShieldAlert } from 'lucide-react';
 import { Language, translations } from '../translations';
+import { useAuth } from '../context/AuthContext';
 
 interface TopBarProps {
   lang: Language;
@@ -8,6 +9,7 @@ interface TopBarProps {
   onToggleLang?: () => void;
   onOpenLicense?: () => void;
   onOpenAdmin?: () => void;
+  onOpenCandidatePortal?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ 
@@ -15,9 +17,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   setLang, 
   onToggleLang, 
   onOpenLicense, 
-  onOpenAdmin 
+  onOpenAdmin,
+  onOpenCandidatePortal
 }) => {
   const t = translations[lang];
+  const { candidateUser, adminUser, isAdminAuthenticated, isCandidateAuthenticated, logoutCandidate, logoutAdmin } = useAuth();
 
   const handleLanguageClick = () => {
     if (onToggleLang) {
@@ -56,8 +60,75 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         </div>
 
-        {/* Right: Language switch & Contact Hotline */}
-        <div className="flex items-center gap-4 text-xs">
+        {/* Right: Dynamic Auth States, Language switch, Contact Hotline */}
+        <div className="flex items-center gap-3 sm:gap-4 text-xs flex-wrap justify-center">
+          
+          {/* Candidate Auth State */}
+          {onOpenCandidatePortal && (
+            <div className="flex items-center gap-1.5">
+              <button
+                id="btn-topbar-candidate-portal"
+                onClick={onOpenCandidatePortal}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition cursor-pointer border ${
+                  isCandidateAuthenticated 
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                }`}
+                title="Candidate Application & Document Dashboard"
+              >
+                <UserCheck className={`w-3.5 h-3.5 ${isCandidateAuthenticated ? 'text-emerald-400' : 'text-amber-400'}`} />
+                <span>
+                  {isCandidateAuthenticated 
+                    ? `${candidateUser?.passport} • ${t.myApplications}` 
+                    : t.candidatePortal}
+                </span>
+              </button>
+
+              {isCandidateAuthenticated && (
+                <button
+                  type="button"
+                  onClick={() => logoutCandidate()}
+                  className="p-1 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition cursor-pointer"
+                  title="Sign Out Candidate"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Admin Auth Badge / Toggle */}
+          {isAdminAuthenticated ? (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs">
+              <ShieldAlert className="w-3 h-3 text-amber-400" />
+              <button 
+                onClick={onOpenAdmin}
+                className="hover:underline font-mono text-[11px] font-semibold"
+              >
+                Admin Online
+              </button>
+              <button
+                onClick={() => logoutAdmin()}
+                className="ml-1 text-amber-400 hover:text-red-400 cursor-pointer p-0.5"
+                title="Sign Out Admin"
+              >
+                <LogOut className="w-3 h-3" />
+              </button>
+            </div>
+          ) : onOpenAdmin ? (
+            <button
+              id="btn-topbar-admin"
+              onClick={onOpenAdmin}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition cursor-pointer text-xs font-medium"
+              title="Admin Management"
+            >
+              <Lock className="w-3 h-3 text-amber-400" />
+              <span>Admin</span>
+            </button>
+          ) : null}
+
+          <span className="text-slate-700">|</span>
+
           <a
             id="topbar-phone-link"
             href="tel:+919910044590"
@@ -66,31 +137,52 @@ export const TopBar: React.FC<TopBarProps> = ({
             <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
             <span className="font-medium">{t.supportHotline}</span>
           </a>
-          <span className="text-slate-700">|</span>
-          <button
-            id="btn-language-toggle"
-            onClick={handleLanguageClick}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer text-xs"
-            title="Switch Language"
-          >
-            <Languages className="w-3.5 h-3.5 text-sky-400" />
-            <span className="font-semibold">{lang === 'en' ? 'हिंदी' : 'English'}</span>
-          </button>
 
-          {onOpenAdmin && (
-            <>
-              <span className="text-slate-700">|</span>
-              <button
-                id="btn-topbar-admin"
-                onClick={onOpenAdmin}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition cursor-pointer text-xs font-medium"
-                title="Admin Management"
-              >
-                <Lock className="w-3 h-3 text-amber-400" />
-                <span>Admin</span>
-              </button>
-            </>
-          )}
+          <span className="text-slate-700">|</span>
+
+          {/* Multi-Language Switcher [EN | HI | AR] */}
+          <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+            <Languages className="w-3.5 h-3.5 text-sky-400 ml-1.5 mr-0.5 shrink-0" />
+            <button
+              type="button"
+              id="lang-btn-en"
+              onClick={() => setLang && setLang('en')}
+              className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer text-[11px] ${
+                lang === 'en'
+                  ? 'bg-amber-500 text-slate-950 shadow-xs'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+              title="English"
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              id="lang-btn-hi"
+              onClick={() => setLang && setLang('hi')}
+              className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer text-[11px] ${
+                lang === 'hi'
+                  ? 'bg-amber-500 text-slate-950 shadow-xs'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+              title="हिन्दी (Hindi)"
+            >
+              HI
+            </button>
+            <button
+              type="button"
+              id="lang-btn-ar"
+              onClick={() => setLang && setLang('ar')}
+              className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer text-[11px] ${
+                lang === 'ar'
+                  ? 'bg-amber-500 text-slate-950 shadow-xs'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+              title="العربية (Arabic)"
+            >
+              AR
+            </button>
+          </div>
         </div>
       </div>
     </div>

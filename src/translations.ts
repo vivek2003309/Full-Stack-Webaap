@@ -1,4 +1,4 @@
-export type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'ar';
 
 export const translations = {
   en: {
@@ -14,9 +14,18 @@ export const translations = {
     hireManpower: "Hire Manpower",
     applyForJobs: "Apply for Jobs",
     adminPortal: "Admin Portal",
+    candidatePortal: "Candidate Portal",
+    myApplications: "My Applications",
     modeEmployer: "Employers Mode",
     modeCandidate: "Candidates Mode",
     
+    // Core localized labels for overseas recruitment
+    searchCandidateStatus: "Search Candidate Status",
+    currentProcessingStage: "Current Processing Stage",
+    verificationClearance: "Verification Clearance",
+    applyForVacancy: "Apply for Vacancy",
+    officialConsultant: "Official MEA Registered Overseas Consultant",
+
     // Hero
     liveDrivesBadge: "Live Overseas Recruitment Drives 2026",
     heroHeadline: "Bridging Indian Skilled Talent with Global Industry",
@@ -94,8 +103,17 @@ export const translations = {
     hireManpower: "कार्यबल हायर करें",
     applyForJobs: "नौकरी आवेदन करें",
     adminPortal: "एडमिन पोर्टल",
+    candidatePortal: "उम्मीदवार पोर्टल",
+    myApplications: "मेरे आवेदन एवं दस्तावेज",
     modeEmployer: "नियोक्ता मोड",
     modeCandidate: "उम्मीदवार मोड",
+
+    // Core localized labels
+    searchCandidateStatus: "उम्मीदवार स्थिति खोजें",
+    currentProcessingStage: "वर्तमान प्रसंस्करण चरण",
+    verificationClearance: "सत्यापन एवं निकासी",
+    applyForVacancy: "रिक्ति के लिए आवेदन करें",
+    officialConsultant: "आधिकारिक विदेश मंत्रालय (MEA) पंजीकृत विदेशी सलाहकार",
     
     // Hero
     liveDrivesBadge: "लाइव विदेश भर्ती अभियान 2026",
@@ -160,5 +178,94 @@ export const translations = {
     themeToggleDark: "डार्क थीम (नाइट मोड) चालू करें",
     themeToggleLight: "लाइट थीम चालू करें",
     nightMode: "नाइट मोड"
+  },
+  ar: {
+    govtApproved: "معتمد من حكومة الهند",
+    rcNumber: "رقم ترخيص وزارة الشؤون الخارجية الهندية: B-0613/DEL/COM/1000+/5/5374/1999",
+    verifyLicense: "التحقق من الترخيص",
+    supportHotline: "اتصل: +91 99100 44590",
+    aboutUs: "من نحن",
+    forEmployers: "لأصحاب العمل",
+    jobSeekers: "الباحثون عن عمل",
+    tradeTestCenters: "مراكز الاختبار المهني",
+    contact: "اتصل بنا",
+    hireManpower: "توظيف الكوادر الفنية",
+    applyForJobs: "التقدم للوظائف",
+    adminPortal: "بوابة الإدارة",
+    candidatePortal: "بوابة المرشحين",
+    myApplications: "طلباتي ووثائقي",
+    modeEmployer: "وضع أصحاب العمل",
+    modeCandidate: "وضع المرشحين",
+
+    // Core localized labels
+    searchCandidateStatus: "البحث عن حالة المرشح",
+    currentProcessingStage: "مرحلة المعالجة الحالية",
+    verificationClearance: "التخليص والتحقق الرسمي",
+    applyForVacancy: "التقدم للشاغر الوظيفي",
+    officialConsultant: "استشاري توظيف خارجي مسجل رسمياً لدى وزارة الشؤون الخارجية",
+
+    // Hero
+    liveDrivesBadge: "حملات التوظيف الخارجي المباشرة 2026",
+    heroHeadline: "ربط الكفاءات الهندية الماهرة بالصناعة العالمية",
+    heroSubtitle: "توفير قوى عاملة معتمدة لروسيا والشرق الأوسط وأوروبا وفق أعلى معايير الامتثال القانوني ونظام eMigrate الرسمي.",
+    activeDrivesTitle: "حملات التوظيف النشطة",
+    vacancies: "شواغر",
+
+    // Tracker
+    trackerTitle: "متتبع حالة الجواز والتأشيرة",
+    trackerSubtitle: "متابعة فورية للقياسات الحيوية وحالة التأشيرة في القنصليات للمرشحين المسجلين",
+    trackerPlaceholder: "أدخل رقم جواز السفر أو الرمز (مثال: 'P1234567')",
+    trackBtn: "تتبع الطلب",
+    quickTry: "اختبار سريع:",
+    candidateName: "المرشح",
+    passportNo: "رقم الجواز",
+    appliedTrade: "المهنة / التخصص",
+    destination: "البلد المقصود",
+    currentStage: "المرحلة الحالية",
+    remarks: "ملاحظات المسؤول الرسمي",
+
+    // Job board
+    jobBoardTitle: "فرص العمل بالخارج",
+    jobBoardSubtitle: "عقود مباشرة من شركات كبرى عالمية معتمدة بدون أي وسطاء أو سماسرة",
+    allCountries: "كافة الوجهات",
+    allTrades: "كافة المهن",
+    freePerks: "المزايا المشمولة",
+    viewDetails: "عرض التفاصيل",
+    applyWhatsApp: "التقديم عبر واتساب",
+    applyNow: "تقديم سريع",
+
+    // Career Guidance
+    guidanceBadge: "الجاهزية المهنية والتحضير",
+    guidanceTitle: "دليل اجتياز المقابلات المهنية وإعداد السيرة الذاتية",
+    guidanceSubtitle: "إرشادات معايير الفحص الفني بورش الاختبار وإعداد السيرة الذاتية لضمان القبول الفوري.",
+
+    // Drives Calendar
+    calendarTitle: "جدول مقابلات واختبارات العملاء القادمة",
+    calendarSubtitle: "التق بوفود المقابلات الزائرة من سلطنة عمان وروسيا وقطر في مراكزنا المعتمدة",
+    registerDrive: "التسجيل في المقابلة",
+    venue: "الموقع",
+    tradesInvited: "المهن المطلوبة",
+
+    // Infrastructure
+    infraTitle: "مراكز الاختبار المهني المتطورة",
+    infraSubtitle: "أجنحة متقدمة لاختبارات لحام 6G ومحاكيات المعدات الثقيلة وبرامج التأهيل قبل السفر",
+    sectorsTitle: "القطاعات الرئيسية",
+    howWeWorkTitle: "آلية الاختيار والتعبئة",
+
+    // Social Proof
+    statYears: "عاماً من الخبرة",
+    statMobilized: "عامل تم إيفادهم",
+    statCompliance: "امتثال قانوني كامل",
+    statPartner: "شريك عالمي",
+    testimonialsTitle: "آراء المرشحين والشركات العالمية",
+
+    // Footer
+    footerDisclaimer: "تحذير ضد الاحتيال: شركة تريهان الدولية لا تعتمد أي وكلاء فرعيين أو وسطاء شخصيين ولا تقبل أموالاً نقدية. تتم جميع المعاملات الرسمية حصرياً عبر الحسابات البنكية الرسمية للشركة.",
+    headOffice: "وحدة رقم UG-1 & 2، ويست إند مول، مركز جناكبوري التجاري، نيودلهي - 110058",
+    mumbaiBranch: "منطقة MIDC أنديري شرق، مومباي",
+    gorakhpurBranch: "طريق الجامعة، جوراخبور، أوتار براديش",
+    themeToggleDark: "التبديل إلى الوضع الليلي",
+    themeToggleLight: "التبديل إلى الوضع النهاري",
+    nightMode: "الوضع الليلي"
   }
 };

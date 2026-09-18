@@ -35,18 +35,27 @@ export interface ApplicationTimelineItem {
 }
 
 export interface Application {
-  id: string; // e.g. "TRH-8821"
+  id: string; // use passportNumber.toUpperCase().trim()
+  token?: string; // e.g., "TIC-" + passportNumber.slice(-4)
+  name?: string;
   fullName: string;
-  phone: string;
+  phone?: string;
+  email?: string;
   passportNumber: string; // Uppercase
-  trade: string;
+  trade: string; // e.g., "Structural Welder"
+  country?: string; // e.g., "Russia", "Saudi Arabia"
   targetCountry: string;
-  interviewCity: "Delhi" | "Mumbai" | "Gorakhpur" | string;
-  currentStage: StageNumber;
+  interviewCity?: "Delhi" | "Mumbai" | "Gorakhpur" | string;
+  officerAssigned?: string;
+  interviewDate?: string;
+  currentStage: StageNumber | number; // 1 to 7
+  stageName?: string; // e.g., "Document Verification", "Visa Issued"
   remarks: string;
+  appliedDate?: string;
   createdAt: string;
   updatedAt: string;
   timeline?: ApplicationTimelineItem[];
+  documents?: CandidateDocument[];
 }
 
 export interface InterviewDrive {
@@ -75,6 +84,36 @@ export interface TrackerResponse {
   timeline: ApplicationTimelineItem[];
 }
 
+export interface CandidateDocument {
+  id: string;
+  name: string;
+  nameHi: string;
+  category: 'identity' | 'technical' | 'medical' | 'visa' | 'clearance' | 'travel';
+  status: 'Verified' | 'Pending' | 'Uploaded' | 'Under Review' | 'Pending Action' | 'Approved' | 'Issued' | 'Pending Stage';
+  badgeColor: string;
+  verifiedDate?: string;
+  expiryDate?: string;
+  documentNumber?: string;
+  authority: string;
+  notes: string;
+  notesHi: string;
+  isDownloadable?: boolean;
+  fileUrl?: string;
+  videoUrl?: string;
+  previewType?: 'pdf' | 'image' | 'video' | 'link';
+  updatedAt?: string;
+}
+
+export interface BroadcastLog {
+  id: string;
+  timestamp: string;
+  targetCriteria: string;
+  recipientCount: number;
+  message: string;
+  channel: 'WhatsApp' | 'SMS' | 'Email' | 'Multi-Channel';
+  status: 'Sent' | 'Scheduled' | 'Failed';
+}
+
 export type EnquiryType = "Contact Enquiry" | "Workforce Quota Request";
 export type EnquiryStatus = "New" | "Contacted" | "Closed";
 
@@ -87,7 +126,7 @@ export interface Enquiry {
   email?: string;
   locationOrCountry: string;
   tradesOrSubject: string;
-  headcount?: number;
+  headcount?: number | null;
   message?: string;
   status: EnquiryStatus;
   createdAt: string;

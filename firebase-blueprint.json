@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "collections": [
+    {
+      "name": "candidates",
+      "description": "Registered job applicant records with passport numbers, recruitment stages (1-7), trade, destination, and clearance document status.",
+      "securityRules": {
+        "read": "true",
+        "write": "true"
+      }
+    },
+    {
+      "name": "jobs",
+      "description": "Active overseas job openings across Gulf and European countries.",
+      "securityRules": {
+        "read": "true",
+        "write": "true"
+      }
+    },
+    {
+      "name": "enquiries",
+      "description": "Candidate and Employer workforce quota enquiries.",
+      "securityRules": {
+        "read": "true",
+        "write": "true"
+      }
+    },
+    {
+      "name": "admins",
+      "description": "Authorized recruitment agency staff and administrators.",
+      "securityRules": {
+        "read": "true",
+        "write": "true"
+      }
+    }
+  ]
+}

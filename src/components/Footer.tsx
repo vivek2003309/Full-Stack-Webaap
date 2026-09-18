@@ -13,6 +13,7 @@ import {
   ArrowUp
 } from 'lucide-react';
 import { Language, translations } from '../translations';
+import { MinistryComplianceBar } from './MinistryComplianceBar';
 
 interface FooterProps {
   lang: Language;
@@ -34,8 +35,14 @@ export const Footer: React.FC<FooterProps> = ({
   const t = translations[lang];
 
   return (
-    <footer id="contact" className="bg-[#09172B] text-slate-300 pt-16 pb-12 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      <MinistryComplianceBar 
+        lang={lang}
+        onOpenLicense={onOpenLicense}
+        onOpenContact={onOpenContact}
+      />
+      <footer id="contact" className="bg-[#09172B] text-slate-300 pt-16 pb-12 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Anti-Fraud Disclaimer Banner */}
         <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-5 mb-14 text-amber-200 text-xs flex flex-col md:flex-row items-center gap-4">
@@ -337,5 +344,6 @@ export const Footer: React.FC<FooterProps> = ({
 
       </div>
     </footer>
+    </>
   );
 };

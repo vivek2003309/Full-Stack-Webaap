@@ -79,3 +79,88 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   );
   animation: shimmer 1.8s infinite;
 }
+
+/* =========================================================
+   PRINT DOSSIER & GATE PASS MEDIA STYLES
+   ========================================================= */
+@media print {
+  /* Hide non-printable UI elements */
+  nav,
+  header,
+  footer,
+  #candidate-dashboard-modal-backdrop > *:not(#candidate-dashboard-container),
+  .no-print,
+  button,
+  input,
+  select,
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Reset body and background for crisp A4 paper printing */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  #root {
+    visibility: hidden;
+  }
+
+  /* Isolate and display only the print dossier */
+  #candidate-dashboard-modal-backdrop {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  #candidate-dashboard-container {
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  #candidate-dashboard-header,
+  #candidate-dashboard-nav,
+  #candidate-dashboard-app-selector {
+    display: none !important;
+  }
+
+  #candidate-dossier-printable {
+    visibility: visible !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 1.5cm !important;
+    border: 2px solid #0f172a !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    background: #ffffff !important;
+    color: #09090b !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 1cm;
+  }
+}

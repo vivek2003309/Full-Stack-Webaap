@@ -33,7 +33,10 @@ export const Preloader: React.FC = () => {
       setProgress(calculatedProgress);
     }, 30);
 
+    let finished = false;
     const finishLoading = () => {
+      if (finished) return;
+      finished = true;
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, minDuration - elapsed);
 
